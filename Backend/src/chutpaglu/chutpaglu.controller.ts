@@ -1,12 +1,12 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { ChutpagluService } from './chutpaglu.service';
-import { SkipThrottle, Throttle } from '@nestjs/throttler';
+import { BrowserCheckGuard } from '../common/guards/browser-check.guard';
 
 @Controller()
+@UseGuards(BrowserCheckGuard)
 export class ChutpagluController {
   constructor(private readonly chutpagluService: ChutpagluService) {}
   
-  @Throttle({ default: { limit: 3, ttl: 5000 } })
   @Post('random-chutpaglu-match')
   saveWinner(@Body('_id') _id: number) {
     return this.chutpagluService.saveWinner(_id);
