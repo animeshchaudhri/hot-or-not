@@ -8,7 +8,6 @@ import { ArrowRight, Flame } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 
-// Define the API response interface
 interface Person {
   _id: string;
   name: string;
@@ -49,7 +48,6 @@ export default function ComparisonScreen() {
     const selectedPerson = side === "left" ? leftPerson : rightPerson
     
     try {
-      // Submit vote
       if (selectedPerson) {
         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/random-chutpaglu-match`, {
           method: 'POST',
@@ -65,22 +63,21 @@ export default function ComparisonScreen() {
       console.error('Error submitting vote:', error)
     }
 
-    // Get new pair after a delay
     setTimeout(() => {
       fetchNewPair()
       setSelectedSide(null)
       setIsAnimating(false)
-    }, 1000)
+    }, 800)
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Who's Hotter?</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Choose between the two people below.</p>
+    <div className="mx-auto max-w-3xl px-2">
+      <div className="mb-3 text-center">
+        <h2 className="text-xl font-bold tracking-tight sm:text-2xl">Who's Hotter?</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Choose between the two people below.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2">
         {isLoading ? (
           <>
             <PersonCardSkeleton />
@@ -97,8 +94,8 @@ export default function ComparisonScreen() {
             />
 
             <div className="flex items-center justify-center sm:hidden">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                <span className="text-base font-medium">VS</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                <span className="text-sm font-medium">VS</span>
               </div>
             </div>
 
@@ -113,14 +110,15 @@ export default function ComparisonScreen() {
         )}
       </div>
 
-      <div className="mt-6 flex justify-center">
+      <div className="mt-3 flex justify-center">
         <Button
           variant="outline"
-          className="gap-2"
+          size="sm"
+          className="gap-1"
           onClick={fetchNewPair}
           disabled={isLoading || isAnimating}
         >
-          Skip <ArrowRight className="h-4 w-4" />
+          Skip <ArrowRight className="h-3 w-3" />
         </Button>
       </div>
     </div>
@@ -142,18 +140,18 @@ function PersonCard({ person, isSelected, isAnimating, onVote, side }: PersonCar
     <Card
       className={cn(
         "overflow-hidden transition-all duration-300",
-        isSelected && "ring-2 ring-primary ring-offset-2",
+        isSelected && "ring-1 ring-primary ring-offset-1",
         isAnimating && !isSelected && "opacity-50 scale-95",
       )}
     >
       <CardContent className="p-0">
-        <div className="relative aspect-[4/5] w-full overflow-hidden">
+        <div className="relative aspect-[1/1] w-full overflow-hidden">
           <Image src={person.imageURL || "/placeholder.svg"} alt={person.name} fill className="object-cover" priority />
         </div>
-        <div className="p-4">
-          <h3 className="text-lg font-semibold">{person.name}</h3>
-          <Button className="mt-3 w-full gap-2" onClick={onVote} disabled={isAnimating}>
-            <Flame className="h-4 w-4" />
+        <div className="p-2">
+          <h3 className="text-sm font-semibold truncate">{person.name}</h3>
+          <Button className="mt-2 w-full gap-1 text-xs py-1 h-8" onClick={onVote} disabled={isAnimating} size="sm">
+            <Flame className="h-3 w-3" />
             This One's Hotter
           </Button>
         </div>
@@ -166,15 +164,14 @@ function PersonCardSkeleton() {
   return (
     <Card className="overflow-hidden">
       <CardContent className="p-0">
-        <div className="relative aspect-[4/5] w-full">
+        <div className="relative aspect-[1/1] w-full">
           <Skeleton className="h-full w-full" />
         </div>
-        <div className="p-4">
-          <Skeleton className="h-6 w-2/3 mb-3" />
-          <Skeleton className="h-10 w-full" />
+        <div className="p-2">
+          <Skeleton className="h-4 w-2/3 mb-2" />
+          <Skeleton className="h-8 w-full" />
         </div>
       </CardContent>
     </Card>
   )
 }
-
