@@ -51,7 +51,7 @@ export default function ComparisonScreen() {
     try {
       // Submit vote
       if (selectedPerson) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}http://localhost:4000/random-chutpaglu-match`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/random-chutpaglu-match`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
