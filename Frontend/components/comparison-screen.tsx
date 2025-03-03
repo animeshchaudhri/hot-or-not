@@ -1,124 +1,124 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Flame } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
 
-const mockPeople = [
-  {
-    id: 1,
-    name: "Alex Johnson",
-    image: "/placeholder.svg?height=500&width=400",
-    rating: 1500,
-  },
-  {
-    id: 2,
-    name: "Jamie Smith",
-    image: "/placeholder.svg?height=500&width=400",
-    rating: 1520,
-  },
-  {
-    id: 3,
-    name: "Taylor Wilson",
-    image: "/placeholder.svg?height=500&width=400",
-    rating: 1480,
-  },
-  {
-    id: 4,
-    name: "Jordan Lee",
-    image: "/placeholder.svg?height=500&width=400",
-    rating: 1550,
-  },
-  {
-    id: 5,
-    name: "Casey Brown",
-    image: "/placeholder.svg?height=500&width=400",
-    rating: 1510,
-  },
-  {
-    id: 6,
-    name: "Riley Davis",
-    image: "/placeholder.svg?height=500&width=400",
-    rating: 1490,
-  },
-]
+interface Person {
+  _id: string;
+  name: string;
+  imageURL: string;
+}
 
 export default function ComparisonScreen() {
-  const [leftPerson, setLeftPerson] = useState(mockPeople[0])
-  const [rightPerson, setRightPerson] = useState(mockPeople[1])
+  const [leftPerson, setLeftPerson] = useState<Person | null>(null)
+  const [rightPerson, setRightPerson] = useState<Person | null>(null)
   const [selectedSide, setSelectedSide] = useState<"left" | "right" | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
-  const handleVote = (side: "left" | "right") => {
+  // Function to fetch a new pair
+  const fetchNewPair = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/random-chutpaglu-match`)
+      const data = await response.json()
+      setLeftPerson(data[0])
+      setRightPerson(data[1])
+    } catch (error) {
+      console.error('Error fetching comparison pair:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Initial load
+  useEffect(() => {
+    fetchNewPair()
+  }, [])
+
+  const handleVote = async (side: "left" | "right") => {
     setSelectedSide(side)
     setIsAnimating(true)
 
-    setTimeout(() => {
-      // Get two random people that are different from each other
-      let newLeft, newRight
-      do {
-        newLeft = mockPeople[Math.floor(Math.random() * mockPeople.length)]
-        newRight = mockPeople[Math.floor(Math.random() * mockPeople.length)]
-      } while (newLeft.id === newRight.id)
+    const selectedPerson = side === "left" ? leftPerson : rightPerson
+    
+    try {
+      if (selectedPerson) {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/random-chutpaglu-match`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            _id: selectedPerson._id
+          })
+        })
+      }
+    } catch (error) {
+      console.error('Error submitting vote:', error)
+    }
 
-      setLeftPerson(newLeft)
-      setRightPerson(newRight)
+    setTimeout(() => {
+      fetchNewPair()
       setSelectedSide(null)
       setIsAnimating(false)
-    }, 1000)
+    }, 800)
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <div className="mb-6 text-center">
-        <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Who's Hotter?</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Choose between the two people below.</p>
+    <div className="mx-auto max-w-3xl px-2">
+      <div className="mb-3 text-center">
+        <h2 className="text-xl font-bold tracking-tight sm:text-2xl">Who's Hotter?</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Choose between the two people below.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2">
-        <PersonCard
-          person={leftPerson}
-          isSelected={selectedSide === "left"}
-          isAnimating={isAnimating}
-          onVote={() => handleVote("left")}
-          side="left"
-        />
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2">
+        {isLoading ? (
+          <>
+            <PersonCardSkeleton />
+            <PersonCardSkeleton />
+          </>
+        ) : (
+          <>
+            <PersonCard
+              person={leftPerson}
+              isSelected={selectedSide === "left"}
+              isAnimating={isAnimating}
+              onVote={() => handleVote("left")}
+              side="left"
+            />
 
-        <div className="flex items-center justify-center sm:hidden">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-            <span className="text-base font-medium">VS</span>
-          </div>
-        </div>
+            <div className="flex items-center justify-center sm:hidden">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                <span className="text-sm font-medium">VS</span>
+              </div>
+            </div>
 
-        <PersonCard
-          person={rightPerson}
-          isSelected={selectedSide === "right"}
-          isAnimating={isAnimating}
-          onVote={() => handleVote("right")}
-          side="right"
-        />
+            <PersonCard
+              person={rightPerson}
+              isSelected={selectedSide === "right"}
+              isAnimating={isAnimating}
+              onVote={() => handleVote("right")}
+              side="right"
+            />
+          </>
+        )}
       </div>
 
-      <div className="mt-6 flex justify-center">
+      <div className="mt-3 flex justify-center">
         <Button
           variant="outline"
-          className="gap-2"
-          onClick={() => {
-            // Skip current comparison
-            let newLeft, newRight
-            do {
-              newLeft = mockPeople[Math.floor(Math.random() * mockPeople.length)]
-              newRight = mockPeople[Math.floor(Math.random() * mockPeople.length)]
-            } while (newLeft.id === newRight.id || (newLeft.id === leftPerson.id && newRight.id === rightPerson.id))
-
-            setLeftPerson(newLeft)
-            setRightPerson(newRight)
-          }}
+          size="sm"
+          className="gap-1"
+          onClick={fetchNewPair}
+          disabled={isLoading || isAnimating}
         >
-          Skip <ArrowRight className="h-4 w-4" />
+          Skip <ArrowRight className="h-3 w-3" />
         </Button>
       </div>
     </div>
@@ -126,35 +126,32 @@ export default function ComparisonScreen() {
 }
 
 interface PersonCardProps {
-  person: {
-    id: number
-    name: string
-    image: string
-    rating: number
-  }
-  isSelected: boolean
-  isAnimating: boolean
-  onVote: () => void
-  side: "left" | "right"
+  person: Person | null;
+  isSelected: boolean;
+  isAnimating: boolean;
+  onVote: () => void;
+  side: "left" | "right";
 }
 
 function PersonCard({ person, isSelected, isAnimating, onVote, side }: PersonCardProps) {
+  if (!person) return <PersonCardSkeleton />
+  
   return (
     <Card
       className={cn(
         "overflow-hidden transition-all duration-300",
-        isSelected && "ring-2 ring-primary ring-offset-2",
+        isSelected && "ring-1 ring-primary ring-offset-1",
         isAnimating && !isSelected && "opacity-50 scale-95",
       )}
     >
       <CardContent className="p-0">
-        <div className="relative aspect-[4/5] w-full overflow-hidden">
-          <Image src={person.image || "/placeholder.svg"} alt={person.name} fill className="object-cover" priority />
+        <div className="relative aspect-[1/1] w-full overflow-hidden">
+          <Image src={person.imageURL || "/placeholder.svg"} alt={person.name} fill className="object-cover" priority />
         </div>
-        <div className="p-4">
-          <h3 className="text-lg font-semibold">{person.name}</h3>
-          <Button className="mt-3 w-full gap-2" onClick={onVote} disabled={isAnimating}>
-            <Flame className="h-4 w-4" />
+        <div className="p-2">
+          <h3 className="text-sm font-semibold truncate">{person.name}</h3>
+          <Button className="mt-2 w-full gap-1 text-xs py-1 h-8" onClick={onVote} disabled={isAnimating} size="sm">
+            <Flame className="h-3 w-3" />
             This One's Hotter
           </Button>
         </div>
@@ -163,3 +160,18 @@ function PersonCard({ person, isSelected, isAnimating, onVote, side }: PersonCar
   )
 }
 
+function PersonCardSkeleton() {
+  return (
+    <Card className="overflow-hidden">
+      <CardContent className="p-0">
+        <div className="relative aspect-[1/1] w-full">
+          <Skeleton className="h-full w-full" />
+        </div>
+        <div className="p-2">
+          <Skeleton className="h-4 w-2/3 mb-2" />
+          <Skeleton className="h-8 w-full" />
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
