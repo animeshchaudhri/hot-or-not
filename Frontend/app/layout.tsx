@@ -3,6 +3,10 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Analytics } from '@vercel/analytics/next';
+// In layout.tsx
+import { Toaster } from "@/components/ui/toaster"
+
+// Inside your layout return statement, add:
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -19,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}  <Analytics />    <script defer src="https://cloud.umami.is/script.js" data-website-id="2af47a21-d406-463c-b565-195022bbe950"></script>
+      <body className={inter.className}>{children}  <Analytics />   <Toaster /> <script defer src="https://cloud.umami.is/script.js" data-website-id="2af47a21-d406-463c-b565-195022bbe950"></script>
       </body>
     </html>
   )

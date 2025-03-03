@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Flame } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "./ui/use-toast"
 
 interface Person {
   _id: string;
@@ -26,6 +27,19 @@ export default function ComparisonScreen() {
     try {
       setIsLoading(true)
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/random-chutpaglu-match`)
+      if (!response.ok) {
+        // Check if it's a rate limit error
+        if (response.status === 429) {
+          toast({
+            title: "Slow down!",
+            description: "You're voting too fast. Please wait a moment.",
+            variant: "destructive",
+          })
+          return
+        }
+        
+        throw new Error(`Server responded with ${response.status}`)
+      }
       const data = await response.json()
       setLeftPerson(data[0])
       setRightPerson(data[1])
@@ -49,7 +63,7 @@ export default function ComparisonScreen() {
     
     try {
       if (selectedPerson) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/random-chutpaglu-match`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/random-chutpaglu-match`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -58,7 +72,19 @@ export default function ComparisonScreen() {
             _id: selectedPerson._id
           })
         })
+      
+      if (!response.ok) {
+        if (response.status === 429) {
+          toast({
+            title: "Rate limited",
+            description: "You're voting too fast. Please wait a moment.",
+            variant: "destructive",
+          })
+          return
+        }
+        throw new Error(`Server responded with ${response.status}`)
       }
+    }
     } catch (error) {
       console.error('Error submitting vote:', error)
     }
