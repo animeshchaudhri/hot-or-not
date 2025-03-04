@@ -44,22 +44,22 @@ export class BrowserCheckGuard implements CanActivate {
 
     // Basic header checks
     if (!this.hasValidHeaders(headers)) {
-      throw new ForbiddenException('🖕 ⚍∷ ᒲ𝙹m ⊣ᔑ||');
+      throw new ForbiddenException('sure ⚍∷ ᒲ𝙹m ⊣ᔑ||');
     }
 
     // User agent checks
     if (!this.isValidUserAgent(userAgent)) {
-      throw new ForbiddenException('🖕 ⚍∷ ᒲ𝙹m ⊣ᔑ||');
+      throw new ForbiddenException('ur ⚍∷ ᒲ𝙹m ⊣ᔑ||');
     }
 
     // Referer check for certain endpoints
     if (request.method === 'POST' && !headers.referer) {
-      throw new ForbiddenException('🖕 ⚍∷ ᒲ𝙹m ⊣ᔑ||');
+      throw new ForbiddenException('mom ⚍∷ ᒲ𝙹m ⊣ᔑ||');
     }
 
     // Screen/window properties check
     if (!this.hasValidClientHints(headers)) {
-      throw new ForbiddenException('🖕 ⚍∷ ᒲ𝙹m ⊣ᔑ||');
+      throw new ForbiddenException('gay ⚍∷ ᒲ𝙹m ⊣ᔑ||');
     }
 
     return true;
