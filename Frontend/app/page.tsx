@@ -1,56 +1,39 @@
 import Link from "next/link"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import ComparisonScreen from "@/components/comparison-screen"
-import Leaderboard from "@/components/leaderboard"
-import Button from "@/components/Button"
-import CountdownTimer from "@/components/Countdown"
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col">
-       <div className="bg-primary text-white text-center text-sm py-1 font-medium">
-            <CountdownTimer targetDate="2023-11-10T16:30:00Z" />
-          </div>
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center justify-center">
-          <Link href="/" className="flex items-center gap-2 text-xl font-bold">
-            <span className="text-primary">Hot</span>
-            <span>or</span>
-            <span className="text-primary">Not</span>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background">
+      <div className="container max-w-md mx-auto px-4 py-8 text-center">
+        <h1 className="text-3xl font-bold mb-6">
+          <span className="text-primary">Hot</span>
+          <span> or </span>
+          <span className="text-primary">Not</span>
+        </h1>
+        
+        <div className="bg-red-100 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold text-red-600 dark:text-red-400 mb-4">
+            The fun has ended
+          </h2>
+          <p className="text-gray-800 dark:text-gray-200 mb-4">
+            Unfortunately, some people couldn't take a joke, so we had to shut down the site.
+          </p>
+          <Link 
+            href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
+            className="inline-block bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+          >
+            Click here for more information
           </Link>
-          {/* <div className="flex-1 flex justify-end">
-      {/* <Button /> */}
-    {/* </div>  */}
         </div>
         
-      </header>
-      <main className="flex-1">
-        <div className="container py-4 sm:py-8">
-          <Tabs defaultValue="compare" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2 mx-auto mb-6">
-              <TabsTrigger value="compare">Compare</TabsTrigger>
-              <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-            </TabsList>
-            <TabsContent value="compare" className="mt-0">
-              <ComparisonScreen />
-            </TabsContent>
-            <TabsContent value="leaderboard" className="mt-0">
-              <Leaderboard />
-            </TabsContent>
-          </Tabs>
-        </div>
-      </main>
-      <footer className="border-t py-4">
-        <div className="container text-center">
-          <p className="text-xs text-muted-foreground">
-        Made with not ❤️ by <Link href="https://x.com/animesh_xd" className="text-primary">Animesh</Link> and <Link href="https://x.com/Shreverrr" className="text-primary">Shreshth</Link>
+        <footer className="text-sm text-muted-foreground">
+          <p className="mb-2">
+            Made with not ❤️ by <Link href="https://x.com/animesh_xd" className="text-primary hover:underline">Animesh</Link> and <Link href="https://x.com/Shreverrr" className="text-primary hover:underline">Shreshth</Link>
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
-        Disclaimer: This data is publicly hosted by the Uni. We don't own this data lol. 
+          <p className="text-xs">
+            Disclaimer: This data was publicly hosted by the Uni. We don't own this data lol.
           </p>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   )
 }
-
