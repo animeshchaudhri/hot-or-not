@@ -10,6 +10,9 @@ export class BrowserCheckGuard implements CanActivate {
     'sec-ch-ua',
     'sec-ch-ua-mobile',
     'sec-ch-ua-platform',
+    'user-agent',
+    'sec-fetch-site',
+    'sec-fetch-mode'
   ];
 
   private readonly BROWSER_USER_AGENTS = [
@@ -18,7 +21,11 @@ export class BrowserCheckGuard implements CanActivate {
     /Safari/i,
     /Firefox/i,
     /Edge/i,
-    /Opera/i
+    /Opera/i,
+    /iPhone/i,
+    /iPad/i,
+    /AppleWebKit/i,
+    /Version\/[0-9.]+/i
   ];
 
   private readonly SUSPICIOUS_PATTERNS = [
@@ -86,7 +93,13 @@ export class BrowserCheckGuard implements CanActivate {
   private hasValidClientHints(headers: any): boolean {
     const platformHint = headers['sec-ch-ua-platform'];
     const mobileHint = headers['sec-ch-ua-mobile'];
-    const validPlatforms = ['Windows', 'macOS', 'Linux', 'Android', 'iOS'];
+    const validPlatforms = ['Windows', 'macOS', 'Linux', 'Android', 'iOS', 'iPhone', 'iPad'];
+
+    // Special handling for Safari which might not provide proper sec-ch-ua headers
+    if (headers['user-agent']?.includes('Safari') && 
+        (headers['user-agent']?.includes('iPhone') || headers['user-agent']?.includes('iPad'))) {
+      return true;
+    }
 
     return (
       platformHint &&
