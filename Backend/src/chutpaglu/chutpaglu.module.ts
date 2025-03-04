@@ -4,6 +4,7 @@ import { ChutpagluController } from './chutpaglu.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { ChutPaglu, ChutPagluSchema } from './models/chutpaglu.schema';
+import { RateLimiterService } from './ratelimiting';
 @Module({
   imports: [
     MongooseModule.forRootAsync({
@@ -20,6 +21,7 @@ import { ChutPaglu, ChutPagluSchema } from './models/chutpaglu.schema';
   controllers: [ChutpagluController],
   providers: [
     ChutpagluService,
+    RateLimiterService
   ],
 })
 export class ChutpagluModule { }

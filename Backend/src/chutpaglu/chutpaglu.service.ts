@@ -15,7 +15,7 @@ export class ChutpagluService {
     return this.chutPagluModel.find().sort({ rank: 'desc' }).limit(10);
   }
 
-  async saveWinner(_id: number) {
+  async saveWinner(_id: string) {
     return this.chutPagluModel.updateOne({ _id: _id }, { $inc: { rank: 1 } });
   }
 }
