@@ -17,6 +17,9 @@ export class ChutPaglu {
 
   @Prop({ required: true })
   imageURL: string;
+
+  @Prop({ required: true })
+  deleted: boolean;
 }
 
 export const ChutPagluSchema = SchemaFactory.createForClass(ChutPaglu);

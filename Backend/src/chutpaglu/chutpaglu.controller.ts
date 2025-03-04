@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, HttpException, HttpStatus, Delete } from '@nestjs/common';
 import { ChutpagluService } from './chutpaglu.service';
 import { BrowserCheckGuard } from '../common/guards/browser-check.guard';
 import { RateLimiterService } from './ratelimiting';
 
 @Controller()
-@UseGuards(BrowserCheckGuard)
+// @UseGuards(BrowserCheckGuard)
 export class ChutpagluController {
   constructor(private readonly chutpagluService: ChutpagluService,
     private readonly rateLimiterService: RateLimiterService
@@ -21,6 +21,13 @@ export class ChutpagluController {
         }
         
     return this.chutpagluService.saveWinner(_id);
+  }
+
+  @Delete('chutpaglu')
+  deleteUser(@Body('_id') _id: string) {
+    console.log("delete hit");
+        
+    return this.chutpagluService.deleteUser(_id);
   }
 
   @Get('random-chutpaglu-match')
