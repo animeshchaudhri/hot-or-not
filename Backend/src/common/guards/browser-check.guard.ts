@@ -7,12 +7,9 @@ export class BrowserCheckGuard implements CanActivate {
     'accept',
     'accept-language',
     'accept-encoding',
-    'sec-ch-ua',
-    'sec-ch-ua-mobile',
-    'sec-ch-ua-platform',
     'user-agent',
-    'sec-fetch-site',
-    'sec-fetch-mode'
+    'sec-fetch-mode',
+    'sec-fetch-site'
   ];
 
   private readonly BROWSER_USER_AGENTS = [
@@ -66,9 +63,18 @@ export class BrowserCheckGuard implements CanActivate {
   }
 
   private hasValidHeaders(headers: any): boolean {
-    const hasRequired = this.REQUIRED_HEADERS.every(header => 
-      headers[header] !== undefined
-    );
+    // Special handling for Safari
+    if (headers['user-agent']?.includes('Safari') && 
+        !headers['user-agent']?.includes('Chrome')) {
+      const safariRequired = this.REQUIRED_HEADERS.every(header => 
+        headers[header] !== undefined
+      );
+      return safariRequired;
+    }
+
+    // Regular header check for other browsers
+    const hasRequired = [...this.REQUIRED_HEADERS, 'sec-ch-ua', 'sec-ch-ua-mobile', 'sec-ch-ua-platform']
+      .every(header => headers[header] !== undefined);
 
     const hasValidContentType = !headers['content-type'] || 
       headers['content-type'].includes('application/json');
@@ -91,21 +97,37 @@ export class BrowserCheckGuard implements CanActivate {
   }
 
   private hasValidClientHints(headers: any): boolean {
-    const platformHint = headers['sec-ch-ua-platform'];
-    const mobileHint = headers['sec-ch-ua-mobile'];
-    const validPlatforms = ['Windows', 'macOS', 'Linux', 'Android', 'iOS', 'iPhone', 'iPad'];
+    // Special handling for local development
+    const isLocalhost = headers.host?.includes('localhost') || 
+                       headers.origin?.includes('localhost');
 
-    // Special handling for Safari which might not provide proper sec-ch-ua headers
-    if (headers['user-agent']?.includes('Safari') && 
-        (headers['user-agent']?.includes('iPhone') || headers['user-agent']?.includes('iPad'))) {
+    // Special handling for Safari/iOS
+    const isSafari = headers['user-agent']?.includes('Safari') &&
+                    !headers['user-agent']?.includes('Chrome');
+    const isIOS = headers['user-agent']?.includes('iPhone') || 
+                  headers['user-agent']?.includes('iPad');
+
+    if ((isSafari || isIOS) && 
+        headers['sec-fetch-mode'] === 'cors' && 
+        headers['sec-fetch-site'] === 'same-site' &&
+        isLocalhost) {
       return true;
     }
 
-    return (
-      platformHint &&
-      mobileHint &&
-      (validPlatforms.some(p => platformHint.includes(p)) ||
-        ['?0', '?1'].includes(mobileHint))
-    );
+    // Fall back to standard checks only if not Safari/iOS
+    if (!isSafari && !isIOS) {
+      const platformHint = headers['sec-ch-ua-platform'];
+      const mobileHint = headers['sec-ch-ua-mobile'];
+      const validPlatforms = ['Windows', 'macOS', 'Linux', 'Android', 'iOS', 'iPhone', 'iPad'];
+
+      return (
+        platformHint &&
+        mobileHint &&
+        (validPlatforms.some(p => platformHint.includes(p)) ||
+          ['?0', '?1'].includes(mobileHint))
+      );
+    }
+
+    return true;
   }
 }
