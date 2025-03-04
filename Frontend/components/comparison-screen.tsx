@@ -33,8 +33,10 @@ export default function ComparisonScreen() {
         
         if (response.status === 429) {
           toast.error("Rate limited: You're voting too fast. Please wait a moment.");
-
-          return
+          return;
+        }
+        if(response.status === 403){
+          toast.success("Use google chrome Bro");
         }
         
         throw new Error(`Server responded with ${response.status}`)
@@ -75,11 +77,14 @@ export default function ComparisonScreen() {
       if (!response.ok) {
         if (response.status === 429) {
           toast.error("Rate limited: You're voting too fast. Please wait a moment.");
-
-          return
+          return;
+        }
+        if(response.status === 403){
+          toast.success("Use google chrome Bro");
         }
         throw new Error(`Server responded with ${response.status}`)
       }
+     
     }
     } catch (error) {
       console.error('Error submitting vote:', error)
